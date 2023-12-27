@@ -23,12 +23,12 @@ class LinearTimeInvariant(torch.nn.Module):
         A = torch.empty((0,0), dtype=torch.float32)
         
         for item in list(eigs.items()):
-            re = item[0][0]
-            im = item[0][1]
+            alpha = item[0][0] # real part -> omotetia exp(alpha*t)
+            omega = item[0][1] # immaginary part -> rotation of theta = omega*t
             mul = item[1]
 
             for i in range(mul):
-                block = torch.tensor([[re, -im], [im, re]])
+                block = torch.tensor([[alpha, omega], [-omega, alpha]])
                 A = torch.block_diag(A, block)
                 
         return A
