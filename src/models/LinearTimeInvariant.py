@@ -28,7 +28,7 @@ class LinearTimeInvariant(torch.nn.Module):
             mul = item[1]
 
             for i in range(mul):
-                block = torch.tensor([[re, im], [-im, re]])
+                block = torch.tensor([[re, -im], [im, re]])
                 A = torch.block_diag(A, block)
                 
         return A
