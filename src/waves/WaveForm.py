@@ -7,8 +7,12 @@ import torchaudio.functional as F
 
 class WaveForm:
 
-    def __init__(self, path):
-        self.wave, self.rate = torchaudio.load(download_asset(path))
+    def __init__(self, tens=torch.empty(1,0), path=""):
+        if tens.numel() == 0:
+            self.wave, self.rate = torchaudio.load(download_asset(path))
+        else:
+            self.wave = tens
+            self.rate = 1600
 
     def play(self):
         waveform = self.wave
