@@ -52,3 +52,18 @@ class LinearTimeInvariant(torch.nn.Module):
         self.x = self.Ad @ self.x + self.Bd @ u
         y = self.C @ self.x + self.D @ u
         return y
+    
+    def predict(self, u):
+        """
+        Predict all timesteps
+        """
+        T = u.size(2)
+        for t in range(T):
+            u_t = u[0,:,t].unsqueeze(1)
+            y_t = self.forward(u_t)
+            # append the output to tensor
+            if t == 0:
+                y = y_t
+            else:
+                y = torch.cat((y, y_t), 1)
+        return y
