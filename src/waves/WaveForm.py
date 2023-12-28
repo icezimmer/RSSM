@@ -3,7 +3,7 @@ from torchaudio.utils import download_asset
 import torchaudio
 from IPython.display import Audio
 import matplotlib.pyplot as plt
-from torchaudio.transforms import Resample  # If Resample is the correct function
+import torchaudio.functional as F
 
 class WaveForm:
 
@@ -13,7 +13,7 @@ class WaveForm:
     def play(self):
         waveform = self.wave
         if self.rate != 16000:
-            waveform = Resample(self.rate, 16000)(waveform)
+            waveform = F.resample(waveform, self.rate, 16000)
         return Audio(waveform.numpy()[0], rate=16000)
     
     def plot(self):
@@ -37,8 +37,7 @@ class WaveForm:
         if num_channels == 1:
             axes = [axes]
         for c in range(num_channels):
-            # Replace the following line with the correct spectrogram function
-            axes[c].plot_spectrogram(waveform[c], Fs=self.rate)  # Example placeholder
+            axes[c].specgram(waveform[c], Fs=self.rate)
             if num_channels > 1:
                 axes[c].set_ylabel(f"Channel {c+1}")
         figure.suptitle("Spectrogram")
