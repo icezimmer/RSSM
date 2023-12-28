@@ -5,16 +5,14 @@ Define a model subclass of torch.nn.Module that implements a linear time-invaria
 """
 class LinearTimeInvariant(torch.nn.Module):
     def __init__(self, eigs_A, B, C, D, eps):
-        """
-        Initialize the state-space model with system matrices A, B, C, D.
-        These matrices define the dynamics of the system.
-        """
         super(LinearTimeInvariant, self).__init__()
         self.A = self.__state_matrix(eigs_A)
         self.B = torch.tensor(B, dtype=torch.float32)
         self.C = torch.tensor(C, dtype=torch.float32)
         self.D = torch.tensor(D, dtype=torch.float32)
         self.eps = torch.tensor([eps], dtype=torch.float32)
+        self.Ad, self.Bd = self.__discretize()  # Discretize once during initialization
+        self.x = torch.zeros(self.A.shape[0], 1, dtype=torch.float32)
 
     def __state_matrix(self, eigs):
         """
@@ -47,11 +45,10 @@ class LinearTimeInvariant(torch.nn.Module):
         Bd = (self.eps * torch.inverse(I - self.eps/2 * self.A)) @  self.B
         return Ad, Bd
 
-    def forward(self, x, u):
+    def forward(self, u):
         """
         Compute the output of the system based on the current state.
         """
-        Ad, Bd = self.__discretize()
-        next_x = Ad @ x + Bd @ u
-        y = self.C @ next_x + self.D @ u
-        return next_x, y
+        self.x = self.Ad @ self.x + self.Bd @ u
+        y = self.C @ self.x + self.D @ u
+        return y
