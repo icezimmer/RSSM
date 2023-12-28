@@ -12,7 +12,7 @@ class WaveForm:
             self.wave, self.rate = torchaudio.load(download_asset(path))
         else:
             self.wave = tens
-            self.rate = 1600
+            self.rate = 16000
 
     def play(self):
         waveform = self.wave
