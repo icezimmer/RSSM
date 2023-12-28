@@ -3,7 +3,7 @@ from IPython.display import Audio
 from torchaudio.utils import download_asset
 import matplotlib.pyplot as plt
 
-class Waveform:
+class WaveForm:
 
     def __init__(path):
         self.wave, self.rate = torchaudio.load(download_asset(path))
