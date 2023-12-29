@@ -32,6 +32,6 @@ class ConvolutionalLTI(torch.nn.Module):
         
         # f is my kernel [output_size, input_size, kernel_size]
         f = f.view(1,1,-1)
-        y = F.conv1d(u, f) # +d*u, (for now d=0)
+        y = F.conv1d(u, f, padding='same') # +d*u, (for now d=0)
         return y
 
