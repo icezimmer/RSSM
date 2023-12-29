@@ -4,12 +4,14 @@ import torch
 Define a model subclass of torch.nn.Module that implements a linear time-invariant system.
 """
 class LinearTimeInvariant(torch.nn.Module):
-    def __init__(self, eigs_A, B, C, D, eps):
+    def __init__(self, eigs_A, norm_b, norm_c, value_d, eps):
         super(LinearTimeInvariant, self).__init__()
         self.A = self.__state_matrix(eigs_A)
-        self.B = torch.tensor(B, dtype=torch.float32)
-        self.C = torch.tensor(C, dtype=torch.float32)
-        self.D = torch.tensor(D, dtype=torch.float32)
+        b = torch.rand(self.A.shape[0], 1, dtype=torch.float32) - 0.5
+        self.b = b / torch.norm(b) * norm_b
+        c = torch.rand(1, self.A.shape[0], dtype=torch.float32) - 0.5
+        self.C = c / torch.norm(c) * norm_c
+        self.D = torch.tensor([[value_d]], dtype=torch.float32)
         self.eps = torch.tensor([eps], dtype=torch.float32)
         self.Ad, self.Bd = self.__discretize()  # Discretize once during initialization
         self.x = torch.zeros(self.A.shape[0], 1, dtype=torch.float32)
@@ -45,25 +47,30 @@ class LinearTimeInvariant(torch.nn.Module):
         Bd = (self.eps * torch.inverse(I - self.eps/2 * self.A)) @  self.B
         return Ad, Bd
 
-    def forward(self, u):
+    def __onestep(self, u):
         """
         Compute the output of the system based on the current state.
+        u has size [input_size, 1]
         """
         self.x = self.Ad @ self.x + self.Bd @ u
         y = self.C @ self.x + self.D @ u
         return y
     
-    def predict(self, u):
+    def forward(self, u):
         """
-        Predict all y(t). u has size [n, T]
+        Predict all y(t). u has size [seq_length, batch_size, input_size], for now batch_size = 1
         """
-        T = u.size(1)
+        T = u.size(0)
         for t in range(T):
-            u_t = u[:,t].unsqueeze(1)
-            y_t = self.forward(u_t)
-            # append the output to tensor
+            u_t = u[t]
+            # transpose u_t to [input_size, 1]
+            u_t = torch.transpose(u_t, 0, 1)
+            y_t = self.__onestep(u_t)
+            # transpose y_t to [1, output_size]
+            y_t = torch.transpose(y_t, 0, 1)
+            # stack the output
             if t == 0:
                 y = y_t
             else:
-                y = torch.cat((y, y_t), 1)
+                y = torch.stack((y, y_t), dim=0)
         return y
