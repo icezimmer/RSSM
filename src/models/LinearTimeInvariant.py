@@ -10,10 +10,10 @@ class LinearTimeInvariant(torch.nn.Module):
         b = torch.rand(self.A.shape[0], 1, dtype=torch.float32) - 0.5
         self.b = b / torch.norm(b) * norm_b
         c = torch.rand(1, self.A.shape[0], dtype=torch.float32) - 0.5
-        self.C = c / torch.norm(c) * norm_c
+        self.c = c / torch.norm(c) * norm_c
         self.D = torch.tensor([[value_d]], dtype=torch.float32)
         self.eps = torch.tensor([eps], dtype=torch.float32)
-        self.Ad, self.Bd = self.__discretize()  # Discretize once during initialization
+        self.A_d, self.b_d = self.__discretize()  # Discretize once during initialization
         self.x = torch.zeros(self.A.shape[0], 1, dtype=torch.float32)
 
     def __state_matrix(self, eigs):
@@ -39,20 +39,20 @@ class LinearTimeInvariant(torch.nn.Module):
         Discretize the system using the bilinear transform.
         """
         # A = (I - delta_t/2 * A)^-1 * (I + delta_t/2 * A)
-        # B = (I - delta_t/2 * A)^-1 * delta_t * B
-        # C = C
+        # b = (I - delta_t/2 * A)^-1 * delta_t * b
+        # c = c
         # D = D
         I = torch.eye(self.A.shape[0], dtype=torch.float32)
-        Ad = torch.inverse(I - self.eps/2 * self.A) @ (I + self.eps/2 * self.A)
-        Bd = (self.eps * torch.inverse(I - self.eps/2 * self.A)) @  self.B
-        return Ad, Bd
+        A_d = torch.inverse(I - self.eps/2 * self.A) @ (I + self.eps/2 * self.A)
+        b_d = (self.eps * torch.inverse(I - self.eps/2 * self.A)) @  self.b
+        return A_d, b_d
 
     def __onestep(self, u):
         """
         Compute the output of the system based on the current state.
         u has size [input_size, 1]
         """
-        self.x = self.Ad @ self.x + self.Bd @ u
+        self.x = self.A_d @ self.x + self.b_d @ u
         y = self.C @ self.x + self.D @ u
         return y
     
