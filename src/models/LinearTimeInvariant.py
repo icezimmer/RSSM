@@ -59,7 +59,7 @@ class LinearTimeInvariant(torch.nn.Module):
         """
         T = u.size(2)
         for t in range(T):
-            u_t = u[0,:,t].unsqueeze(1)
+            u_t = u[:,t].unsqueeze(1)
             y_t = self.forward(u_t)
             # append the output to tensor
             if t == 0:
