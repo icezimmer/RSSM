@@ -3,9 +3,9 @@ import torch
 """
 Define a model subclass of torch.nn.Module that implements a linear time-invariant system.
 """
-class Recurrent_LTI(torch.nn.Module):
+class RecurrentLTI(torch.nn.Module):
     def __init__(self, eigs_A, norm_b, norm_c, value_d, eps):
-        super(Recurrent_LTI, self).__init__()
+        super(RecurrentLTI, self).__init__()
         self.A = self.__state_matrix(eigs_A)
         b = torch.rand(self.A.shape[0], 1, dtype=torch.float32) - 0.5
         self.b = b / torch.norm(b) * norm_b
