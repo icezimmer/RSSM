@@ -68,9 +68,11 @@ class LinearTimeInvariant(torch.nn.Module):
             y_t = self.__onestep(u_t)
             # transpose y_t to [1, output_size]
             y_t = torch.transpose(y_t, 0, 1)
+            # unsqueeze y_t to [1, 1, output_size]
+            y_t = torch.unsqueeze(y_t, 0)
             # stack the output
             if t == 0:
                 y = y_t
             else:
-                y = torch.stack((y, y_t), dim=0)
+                y = torch.cat((y, y_t), 0)
         return y
