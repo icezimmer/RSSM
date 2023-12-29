@@ -55,9 +55,9 @@ class LinearTimeInvariant(torch.nn.Module):
     
     def predict(self, u):
         """
-        Predict all timesteps
+        Predict all y(t). u has size [n, T]
         """
-        T = u.size(2)
+        T = u.size(1)
         for t in range(T):
             u_t = u[:,t].unsqueeze(1)
             y_t = self.forward(u_t)
