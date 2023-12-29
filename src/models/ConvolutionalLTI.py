@@ -5,9 +5,9 @@ class ConvolutionalLTI(torch.nn.Module):
     def __init__(self, eigs_A, norm_b, norm_c):
         super(ConvolutionalLTI, self).__init__()
         self.eigs_A = eigs_A
-        b = torch.rand(self.A.shape[0], 1, dtype=torch.float32) - 0.5
+        b = torch.rand(sum(eigs_A.values()), 1, dtype=torch.float32) - 0.5
         self.b = b / torch.norm(b) * norm_b
-        c = torch.rand(1, self.A.shape[0], dtype=torch.float32) - 0.5
+        c = torch.rand(1, sum(eigs_A.values()), dtype=torch.float32) - 0.5
         self.c = c / torch.norm(c) * norm_c
     
     def forward(self, u):
