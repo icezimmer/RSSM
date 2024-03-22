@@ -1,3 +1,7 @@
 *.ipynb
 s4env/
 __pycache__
+.replit
+poetry.lock
+pyproject.toml
+rippkgs-index.sqlite
