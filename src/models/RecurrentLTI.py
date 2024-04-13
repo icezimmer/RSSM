@@ -16,6 +16,9 @@ class RecurrentLTI(torch.nn.Module):
         self.A_dsc, self.b_dsc = self.__discretize()  # Discretize once during initialization
         self.x = torch.zeros(self.A.shape[0], 1, dtype=torch.float32)
 
+    def print():
+        print('Hello world!')
+
     def __state_matrix(self, eigs):
         """
         Compute the state matrix of the system.
